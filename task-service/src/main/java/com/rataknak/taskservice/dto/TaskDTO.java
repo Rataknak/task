@@ -10,13 +10,6 @@ public class TaskDTO {
     private String status;
     private Long userId;
 
-    public TaskDTO(Long id, String title, String description, String status, Long userId) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.status = status;
-        this.userId = userId;
-    }
 
     public Long getId() {
         return id;
