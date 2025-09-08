@@ -1,10 +1,8 @@
 package com.rataknak.taskservice.Entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 @Entity
-@Data
 @Table(name = "tasks")
 public class Task {
     @Id
