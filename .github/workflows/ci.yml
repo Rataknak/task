@@ -1,0 +1,50 @@
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_user_service:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Build and test user-service
+        run: mvn -f user-service/pom.xml clean install
+
+  build_task_service:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Build and test task-service
+        run: mvn -f task-service/pom.xml clean install
+
+  build_api_gateway:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Build and test api-gateway
+        run: mvn -f api-gateway/pom.xml clean install
+
+  build:
+    runs-on: ubuntu-latest
+    # The 'needs' keyword ensures this job only runs if all the specified jobs complete successfully
+    needs: [build_user_service, build_task_service, build_api_gateway]
+    steps:
+      - name: All services built and tested
+        run: echo "All services built and tested successfully."
