@@ -12,6 +12,7 @@ services:
 
   task-service:
     build: ./task-service
+
     container_name: task-service
     ports:
       - "8082:8082"
@@ -48,7 +49,7 @@ services:
       POSTGRES_PASSWORD: 200620
       POSTGRES_DB: taskdb,userdb
     ports:
-      - "5432:5432"
+      - "5435:5432"
     networks:
       - spring-microservices-network
     volumes:
