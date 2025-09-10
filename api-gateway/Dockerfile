@@ -7,7 +7,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Stage 2: Create the final, smaller image with only the JRE
-FROM openjdk:17-jre-slim
+FROM eclipse-temurin:17-jre-focal
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
