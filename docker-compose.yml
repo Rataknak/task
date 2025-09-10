@@ -27,7 +27,7 @@ services:
       - spring-microservices-network
 
   user-service:
-    build: ./user-service
+    image: nimrathanak2006/user-service:latest
     container_name: user-service
     ports:
       - "8091:8081"
