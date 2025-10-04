@@ -1,6 +1,6 @@
 services:
   api-gateway:
-    build: ./api-gateway
+    image: nimrathanak2006/api-gateway:latest
     container_name: api-gateway
     ports:
       - "8090:8080"
@@ -11,7 +11,7 @@ services:
       - spring-microservices-network
 
   task-service:
-    build: ./task-service
+    image: nimrathanak2006/task-service:latest
 
     container_name: task-service
     ports:
