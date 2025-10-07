@@ -5,17 +5,18 @@ spring:
   application:
     name: api-gateway
 
+
   cloud:
     gateway:
       routes:
-        - id: user-service
-          uri: http://user-service:8081
+        - id: auth-service
+          uri: http://auth-service:8081    # ← Should be auth-service
           predicates:
-            - Path=/users/**
+            - Path=/auth/**                # ← Should be /auth/**
 
-        - id: task-service
-          uri: http://task-service:8082
+        - id: book-service
+          uri: http://book-service:8082    # ← Should be book-service
           predicates:
-            - Path=/tasks/**
+            - Path=/books/**
   thymeleaf:
     check-template: false

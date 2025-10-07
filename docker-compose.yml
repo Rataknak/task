@@ -5,19 +5,19 @@ services:
     ports:
       - "8090:8080"
     depends_on:
-      - book-service    # ← NEW name
-      - auth-service    # ← NEW name
+      - book-service
+      - auth-service
     networks:
       - spring-microservices-network
 
   book-service:
     image: nimrathanak2006/book-service:latest
 
-    container_name: task-service
+    container_name: book-service
     ports:
       - "8082:8082"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/taskdb
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bookdb
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=200620
     depends_on:
@@ -28,11 +28,11 @@ services:
 
   auth-service:
     image: nimrathanak2006/auth-service:latest
-    container_name: user-service
+    container_name: auth-service
     ports:
-      - "8091:8081"
+      - "8081:8081"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/userdb
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/authdb
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=200620
     depends_on:
@@ -47,9 +47,9 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 200620
-      POSTGRES_DB: taskdb,userdb
+      POSTGRES_DB: postgres
     ports:
-      - "5435:5432"
+      - "5432:5432"
     networks:
       - spring-microservices-network
     volumes:
