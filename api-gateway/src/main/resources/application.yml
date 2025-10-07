@@ -12,6 +12,7 @@ spring:
           uri: http://user-service:8081
           predicates:
             - Path=/users/**
+
         - id: task-service
           uri: http://task-service:8082
           predicates:

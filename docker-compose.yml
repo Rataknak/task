@@ -5,13 +5,13 @@ services:
     ports:
       - "8090:8080"
     depends_on:
-      - task-service
-      - user-service
+      - book-service    # ← NEW name
+      - auth-service    # ← NEW name
     networks:
       - spring-microservices-network
 
-  task-service:
-    image: nimrathanak2006/task-service:latest
+  book-service:
+    image: nimrathanak2006/book-service:latest
 
     container_name: task-service
     ports:
@@ -26,8 +26,8 @@ services:
     networks:
       - spring-microservices-network
 
-  user-service:
-    image: nimrathanak2006/user-service:latest
+  auth-service:
+    image: nimrathanak2006/auth-service:latest
     container_name: user-service
     ports:
       - "8091:8081"
