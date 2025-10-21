@@ -10,6 +10,8 @@ CREATE TABLE users (
     password VARCHAR(255)
 );
 
+INSERT INTO users (username, password, email) VALUES ('admin', 'admin', 'admin@example.com');
+
 \c taskdb;
 
 CREATE TABLE tasks (
