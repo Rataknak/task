@@ -1,4 +1,4 @@
-CREATE DATABASE taskdb;
+CREATE DATABASE bookdb;
 CREATE DATABASE userdb;
 
 \c userdb;
@@ -12,12 +12,12 @@ CREATE TABLE users (
 
 INSERT INTO users (username, password, email) VALUES ('admin', 'admin', 'admin@example.com');
 
-\c taskdb;
+\c bookdb;
 
-CREATE TABLE tasks (
-    id SERIAL PRIMARY KEY,
+CREATE TABLE books (
+    id BIGSERIAL PRIMARY KEY,
     title VARCHAR(255),
     description VARCHAR(255),
-    completed VARCHAR(255),
+    completed BOOLEAN NOT NULL,
     user_id BIGINT
 );
