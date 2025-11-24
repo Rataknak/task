@@ -1,6 +1,6 @@
 services:
   api-gateway:
-    build: ./api-gateway
+    image: nimrathanak2006/api-gateway:latest
     container_name: api-gateway
     ports:
       - "8080:8080"
@@ -25,9 +25,12 @@ services:
         condition: service_healthy
     networks:
       - spring-microservices-network
+    volumes:
+      - ~/.m2:/root/.m2
 
   user-service:
     image: nimrathanak2006/user-service:latest
+    build: ./user-service
     container_name: user-service
     ports:
       - "8081:8081"
@@ -35,11 +38,15 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/userdb
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=200620
+      - JWT_SECRET=thisisalongandsecuresecretkeyforjwtauthenticationthatisatleast64characterslong
+      - JWT_EXPIRATION_MS=3600000
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - spring-microservices-network
+    volumes:
+      - ~/.m2:/root/.m2
 
   postgres:
     image: postgres:latest
@@ -47,13 +54,13 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 200620
-      POSTGRES_DB: taskdb,userdb
+      POSTGRES_DB: postgres
     ports:
       - "5435:5432"
     networks:
       - spring-microservices-network
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
       - ./db-init:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]

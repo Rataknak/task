@@ -127,7 +127,18 @@ public class UserServiceImpl implements UserService {
         }
 
         // If OTP is valid, create a new token indicating the email is verified
-        return jwtUtil.generateVerifiedEmailToken(email);
+        String verifiedEmailToken = jwtUtil.generateVerifiedEmailToken(email);
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put("success", true);
+            responseMap.put("message", "OTP verified successfully");
+            responseMap.put("token", verifiedEmailToken);
+            return mapper.writeValueAsString(responseMap);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error generating JSON response", e);
+        }
     }
 
 

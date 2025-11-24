@@ -70,10 +70,15 @@ public class AuthController {
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(@RequestBody VerifyOtpRequest verifyOtpRequest) {
         try {
-            String verifiedEmailToken = userService.verifyOtp(verifyOtpRequest.getTempToken(), verifyOtpRequest.getOtp());
-            return ResponseEntity.ok(verifiedEmailToken);
+            String jsonResponse = userService.verifyOtp(verifyOtpRequest.getTempToken(), verifyOtpRequest.getOtp());
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(jsonResponse);
         } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
     }
 
