@@ -1,6 +1,6 @@
 services:
   api-gateway:
-    image: nimrathanak2006/api-gateway:latest
+    build: ./api-gateway
     container_name: api-gateway
     ports:
       - "8080:8080"
@@ -29,7 +29,6 @@ services:
       - ~/.m2:/root/.m2
 
   user-service:
-    image: nimrathanak2006/user-service:latest
     build: ./user-service
     container_name: user-service
     ports:
