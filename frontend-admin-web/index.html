@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOMPI - Library Admin System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ---------- Your existing CSS ---------- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: linear-gradient(135deg, #0C3B2E 0%, #1A4F3E 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { display: flex; width: 1000px; height: 650px; background: white; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); overflow: hidden; }
+        .left-panel { flex:1; background: linear-gradient(135deg, #0C3B2E 0%, #1A4F3E 100%); color: white; padding:50px; display:flex; flex-direction:column; justify-content:center; position:relative; overflow:hidden; }
+        .left-panel::before { content: ''; position:absolute; top:-50px; right:-50px; width:200px; height:200px; border-radius:50%; background: rgba(255,255,255,0.1); }
+        .left-panel::after { content: ''; position:absolute; bottom:-80px; left:-80px; width:250px; height:250px; border-radius:50%; background: rgba(255,255,255,0.1); }
+        .logo { display:flex; align-items:center; margin-bottom:30px; position:relative; z-index:1; }
+        .logo i { font-size:36px; margin-right:15px; }
+        .logo h1 { font-size:32px; font-weight:900; letter-spacing:1px; }
+        .left-panel h2 { font-size:36px; margin-bottom:20px; position:relative; z-index:1; }
+        .left-panel p { font-size:18px; line-height:1.6; opacity:0.9; margin-bottom:40px; position:relative; z-index:1; }
+        .features { list-style:none; position:relative; z-index:1; }
+        .features li { margin-bottom:20px; display:flex; align-items:center; font-size:16px; }
+        .features i { margin-right:15px; font-size:20px; }
+        .right-panel { flex:1.2; padding:50px; display:flex; flex-direction:column; justify-content:center; }
+        .app-name { text-align:center; margin-bottom:40px; }
+        .app-name h1 { font-size:36px; font-weight:900; color:#0C3B2E; letter-spacing:1px; margin-bottom:10px; }
+        .app-name p { color:#666666; font-size:18px; }
+        .tabs { display:flex; justify-content:center; margin-bottom:40px; border-bottom:1px solid #EEEEEE; }
+        .tab { padding:15px 40px; font-size:20px; font-weight:500; color:#888888; cursor:pointer; position:relative; transition:all 0.3s; }
+        .tab.active { color:#0C3B2E; font-weight:700; }
+        .tab.active::after { content:''; position:absolute; bottom:-1px; left:50%; transform:translateX(-50%); width:100px; height:4px; background:linear-gradient(to right,#0C3B2E,#1A4F3E); border-radius:2px; }
+        .form-container { max-height:400px; overflow-y:auto; padding-right:10px; }
+        .form-container::-webkit-scrollbar { width:6px; }
+        .form-container::-webkit-scrollbar-track { background:#f1f1f1; border-radius:10px; }
+        .form-container::-webkit-scrollbar-thumb { background:#0C3B2E; border-radius:10px; }
+        .form-group { margin-bottom:25px; }
+        .form-group label { display:block; margin-bottom:10px; color:#555555; font-size:16px; font-weight:500; }
+        .form-control { width:100%; padding:16px 20px; border:1px solid #DDDDDD; border-radius:12px; font-size:16px; transition:all 0.3s; }
+        .form-control:focus { border-color:#0C3B2E; box-shadow:0 0 0 3px rgba(12,59,46,0.2); outline:none; }
+        .password-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; }
+        .show-password { display:flex; align-items:center; color:#555555; font-size:16px; cursor:pointer; }
+        .show-password input { margin-right:10px; transform:scale(1.2); }
+        .forgot-password { color:#0C3B2E; font-size:16px; font-weight:600; text-decoration:none; }
+        .forgot-password:hover { text-decoration:underline; }
+        .btn { width:100%; padding:18px; background:#0C3B2E; color:white; border:none; border-radius:12px; font-size:18px; font-weight:700; cursor:pointer; transition:all 0.3s; display:flex; justify-content:center; align-items:center; }
+        .btn:hover { background:#1A4F3E; transform:translateY(-2px); box-shadow:0 5px 15px rgba(12,59,46,0.4); }
+        .btn:disabled { background:#CCCCCC; cursor:not-allowed; transform:none; box-shadow:none; }
+        .btn-otp { padding:12px 20px; background:#0C3B2E; color:white; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.3s; white-space:nowrap; margin-left:10px; }
+        .btn-otp:hover { background:#1A4F3E; }
+        .btn-otp:disabled { background:#CCCCCC; cursor:not-allowed; }
+        .spinner { width:22px; height:22px; border:3px solid rgba(255,255,255,0.3); border-radius:50%; border-top-color:white; animation:spin 1s linear infinite; margin-right:12px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error-message { color:#E74C3C; font-size:14px; margin-top:8px; display:none; }
+        .success-message { color:#2ECC71; font-size:14px; margin-top:8px; display:none; }
+        .terms { text-align:center; margin:25px 0; color:#666666; font-size:14px; }
+        .terms a { color:#0C3B2E; font-weight:600; text-decoration:none; }
+        .terms a:hover { text-decoration:underline; }
+        .switch-form { text-align:center; margin-top:25px; color:#0C3B2E; font-weight:600; cursor:pointer; font-size:16px; }
+        .email-row { display:flex; gap:10px; }
+        .email-row .form-control { flex:1; }
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:100; }
+        .modal-content { background:white; padding:30px; border-radius:20px; width:90%; max-width:450px; box-shadow:0 10px 25px rgba(0,0,0,0.2); }
+        .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+        .modal-title { font-size:24px; font-weight:700; color:#0C3B2E; }
+        .close-modal { background:none; border:none; font-size:28px; cursor:pointer; color:#666666; }
+        .modal-actions { display:flex; justify-content:flex-end; gap:15px; margin-top:25px; }
+        .btn-secondary { background:#EEEEEE; color:#333333; padding:12px 24px; border:none; border-radius:8px; font-weight:600; cursor:pointer; }
+        .btn-secondary:hover { background:#DDDDDD; }
+        @media (max-width:768px) { .container { flex-direction:column; height:auto; width:100%; } .left-panel, .right-panel { padding:30px; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Left Panel -->
+    <div class="left-panel">
+        <div class="logo"><i class="fas fa-book"></i><h1>KOMPI</h1></div>
+        <h2>Library Admin System</h2>
+        <p>Access the complete library management system with advanced administrative features and user management tools.</p>
+        <ul class="features">
+            <li><i class="fas fa-check-circle"></i> Complete book catalog management</li>
+            <li><i class="fas fa-check-circle"></i> User management and analytics</li>
+            <li><i class="fas fa-check-circle"></i> Advanced reporting tools</li>
+            <li><i class="fas fa-check-circle"></i> Real-time library statistics</li>
+            <li><i class="fas fa-check-circle"></i> Secure authentication system</li>
+        </ul>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+        <div class="app-name"><h1>KOMPI</h1><p>Library Admin System</p></div>
+
+        <div class="tabs">
+            <div class="tab active" id="loginTab">Login</div>
+            <div class="tab" id="signupTab">Signup</div>
+        </div>
+
+        <div class="form-container">
+            <!-- Login Form -->
+            <div id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">E-mail Address</label>
+                    <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email" value="admin@kompi-library.com">
+                    <div class="error-message" id="loginEmailError">Please enter a valid email address</div>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password">
+                    <div class="error-message" id="loginPasswordError">Please enter your password</div>
+                </div>
+                <div class="password-row">
+                    <div class="show-password"><input type="checkbox" id="showPassword"><label for="showPassword">Show Password</label></div>
+                    <a href="#" class="forgot-password">Forgot password?</a>
+                </div>
+                <button class="btn" id="loginBtn"><div class="spinner" id="loginSpinner" style="display:none;"></div><span id="loginBtnText">LOGIN</span></button>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signupForm" style="display:none;">
+                <div class="form-group">
+                    <label for="signupEmail">E-mail Address</label>
+                    <div class="email-row">
+                        <input type="email" id="signupEmail" class="form-control" placeholder="Enter your email">
+                        <button class="btn-otp" id="getOtpBtn">Get OTP</button>
+                    </div>
+                    <div class="error-message" id="signupEmailError">Please enter a valid email address</div>
+                </div>
+                <div class="form-group">
+                    <label for="signupUsername">Username</label>
+                    <input type="text" id="signupUsername" class="form-control" placeholder="Enter username">
+                    <div class="error-message" id="signupUsernameError">Username must be at least 4 characters</div>
+                </div>
+                <div class="form-group">
+                    <label for="signupPhone">Phone Number</label>
+                    <input type="tel" id="signupPhone" class="form-control" placeholder="Enter phone number">
+                    <div class="error-message" id="signupPhoneError">Please enter a valid phone number</div>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" class="form-control" placeholder="Create password">
+                    <div class="error-message" id="signupPasswordError">Password must be at least 6 characters</div>
+                </div>
+                <div class="form-group">
+                    <label for="signupConfirmPassword">Confirm Password</label>
+                    <input type="password" id="signupConfirmPassword" class="form-control" placeholder="Confirm password">
+                    <div class="error-message" id="signupConfirmPasswordError">Passwords do not match</div>
+                </div>
+                <div class="terms">By signing up, you agree to our <a href="#">Terms & Conditions</a></div>
+                <button class="btn" id="signupBtn" disabled><div class="spinner" id="signupSpinner" style="display:none;"></div><span id="signupBtnText">SIGN UP</span></button>
+                <div class="switch-form" id="switchToLogin">Already have an account? Login</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- OTP Modal -->
+<div class="modal" id="otpModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Verify OTP</div>
+            <button class="close-modal" id="closeOtpModal">&times;</button>
+        </div>
+        <p style="color:#666666; margin-bottom:20px;">Enter the 6-digit OTP sent to your email address</p>
+        <div class="form-group">
+            <input type="text" id="otpCode" class="form-control" placeholder="Enter OTP code" maxlength="6">
+            <div class="error-message" id="otpError">Please enter a valid 6-digit OTP</div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-secondary" id="cancelOtp">CANCEL</button>
+            <button class="btn" id="verifyOtpBtn">VERIFY OTP</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---- Element references ----
+    const loginTab = document.getElementById('loginTab');
+    const signupTab = document.getElementById('signupTab');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const switchToLogin = document.getElementById('switchToLogin');
+    const otpModal = document.getElementById('otpModal');
+    const closeOtpModal = document.getElementById('closeOtpModal');
+    const cancelOtp = document.getElementById('cancelOtp');
+    const getOtpBtn = document.getElementById('getOtpBtn');
+    const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+    const showPasswordCheckbox = document.getElementById('showPassword');
+    const loginPassword = document.getElementById('loginPassword');
+    const signupBtn = document.getElementById('signupBtn');
+    const loginBtn = document.getElementById('loginBtn');
+
+    let verifiedEmailToken = "";
+
+    // ---- Tab switching ----
+    loginTab.addEventListener('click', () => {
+        loginTab.classList.add('active');
+        signupTab.classList.remove('active');
+        loginForm.style.display = 'block';
+        signupForm.style.display = 'none';
+        clearAllErrors();
+    });
+
+    signupTab.addEventListener('click', () => {
+        signupTab.classList.add('active');
+        loginTab.classList.remove('active');
+        loginForm.style.display = 'none';
+        signupForm.style.display = 'block';
+        clearAllErrors();
+    });
+
+    switchToLogin.addEventListener('click', () => { 
+        loginTab.click(); 
+    });
+
+    // ---- Show/Hide Password ----
+    showPasswordCheckbox.addEventListener('change', () => {
+        loginPassword.type = showPasswordCheckbox.checked ? 'text' : 'password';
+    });
+
+    // ---- Real-time validation for signup form ----
+    document.getElementById('signupEmail').addEventListener('input', validateSignupForm);
+    document.getElementById('signupUsername').addEventListener('input', validateSignupForm);
+    document.getElementById('signupPhone').addEventListener('input', validateSignupForm);
+    document.getElementById('signupPassword').addEventListener('input', validateSignupForm);
+    document.getElementById('signupConfirmPassword').addEventListener('input', validateSignupForm);
+
+    // ---- Generate OTP ----
+    getOtpBtn.addEventListener('click', async () => {
+        const email = document.getElementById('signupEmail').value;
+        const emailError = document.getElementById('signupEmailError');
+        
+        if (!validateEmail(email)) { 
+            emailError.textContent = 'Please enter a valid email address';
+            emailError.style.display = 'block'; 
+            return; 
+        }
+        emailError.style.display = 'none';
+
+        getOtpBtn.disabled = true; 
+        getOtpBtn.textContent = 'Sending...';
+
+        try {
+            console.log('Sending OTP request for email:', email);
+            
+            const res = await fetch('http://localhost:8080/api/auth/generate-otp', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ email: email })
+            });
+            
+            console.log('OTP Response status:', res.status);
+            
+            let data;
+            const contentType = res.headers.get('content-type');
+            
+            // Check if response is JSON
+            if (contentType && contentType.includes('application/json')) {
+                data = await res.json();
+            } else {
+                const textResponse = await res.text();
+                console.log('Non-JSON response:', textResponse);
+                throw new Error(`Server returned ${res.status}: ${textResponse || 'Bad Request'}`);
+            }
+            
+            console.log('OTP Response data:', data);
+            
+            if (res.ok) {
+                // Store the token for verification
+                verifiedEmailToken = data.tempToken || data.token || data.verifiedEmailToken;
+                
+                if (!verifiedEmailToken) {
+                    console.error('No token found in response:', data);
+                    throw new Error('No authentication token received from server');
+                }
+                
+                console.log('Token received:', verifiedEmailToken);
+                otpModal.style.display = 'flex';
+                
+                // Show success message
+                showSuccessMessage('OTP sent successfully! Check your email.');
+                
+            } else {
+                emailError.textContent = data.message || data.error || `Error: ${res.status} ${res.statusText}`;
+                emailError.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('OTP Generation Error:', error);
+            emailError.textContent = error.message || 'Error sending OTP. Please try again.';
+            emailError.style.display = 'block';
+        } finally {
+            getOtpBtn.disabled = false;
+            getOtpBtn.textContent = 'Get OTP';
+        }
+    });
+
+    // ---- Verify OTP ----
+    verifyOtpBtn.addEventListener('click', async () => {
+        const otpCode = document.getElementById('otpCode').value.trim();
+        const otpError = document.getElementById('otpError');
+        
+        // Validate OTP format
+        if (otpCode.length !== 6 || !/^\d+$/.test(otpCode)) {
+            otpError.textContent = 'OTP must be 6 digits';
+            otpError.style.display = 'block'; 
+            return;
+        }
+        
+        // Check if token exists
+        if (!verifiedEmailToken) {
+            otpError.textContent = 'Session expired. Please request a new OTP.';
+            otpError.style.display = 'block';
+            return;
+        }
+        
+        otpError.style.display = 'none';
+        
+        verifyOtpBtn.disabled = true; 
+        verifyOtpBtn.innerHTML = '<div class="spinner"></div> Verifying...';
+
+        try {
+            console.log('Verifying OTP with token:', verifiedEmailToken, 'OTP:', otpCode);
+            
+            const requestBody = {
+                tempToken: verifiedEmailToken,
+                otp: otpCode
+            };
+            
+            console.log('Sending verification request:', requestBody);
+            
+            const res = await fetch('http://localhost:8080/api/auth/verify-otp', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+            
+            console.log('Verification response status:', res.status);
+            
+            let data;
+            const contentType = res.headers.get('content-type');
+            
+            // Check if response is JSON
+            if (contentType && contentType.includes('application/json')) {
+                data = await res.json();
+            } else {
+                const textResponse = await res.text();
+                console.log('Non-JSON response:', textResponse);
+                throw new Error(`Server returned ${res.status}: ${textResponse || 'Bad Request'}`);
+            }
+            
+            console.log('Verification response data:', data);
+            
+            if (res.ok) {
+                // Success - close modal and enable signup
+                otpModal.style.display = 'none';
+                document.getElementById('otpCode').value = '';
+                
+                // Store the final verified token for registration
+                verifiedEmailToken = data.verifiedEmailToken || verifiedEmailToken;
+                console.log('Final verified token:', verifiedEmailToken);
+                
+                // Show success message
+                showSuccessMessage('Email verified successfully! You can now complete registration.');
+                
+                // Enable signup button
+                signupBtn.disabled = false;
+                
+            } else {
+                otpError.textContent = data.message || data.error || `Verification failed: ${res.status}`;
+                otpError.style.display = 'block';
+                
+                // If token is invalid, clear it
+                if (data.message && (data.message.includes('JWT') || data.message.includes('token'))) {
+                    verifiedEmailToken = "";
+                }
+            }
+        } catch (error) {
+            console.error('OTP Verification Error:', error);
+            otpError.textContent = 'Error verifying OTP. Please try again.';
+            otpError.style.display = 'block';
+        } finally {
+            verifyOtpBtn.disabled = false;
+            verifyOtpBtn.textContent = 'VERIFY OTP';
+        }
+    });
+
+    // ---- Login Functionality ----
+    loginBtn.addEventListener('click', async () => {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const emailError = document.getElementById('loginEmailError');
+        const passwordError = document.getElementById('loginPasswordError');
+        
+        let isValid = true;
+        
+        // Validate email
+        if (!validateEmail(email)) {
+            emailError.style.display = 'block';
+            isValid = false;
+        } else {
+            emailError.style.display = 'none';
+        }
+        
+        // Validate password
+        if (!password) {
+            passwordError.style.display = 'block';
+            isValid = false;
+        } else {
+            passwordError.style.display = 'none';
+        }
+        
+        if (!isValid) return;
+        
+        // Show loading state
+        loginBtn.disabled = true;
+        document.getElementById('loginSpinner').style.display = 'block';
+        document.getElementById('loginBtnText').textContent = 'LOGGING IN...';
+        
+        try {
+            const res = await fetch('http://localhost:8080/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            
+            let responseData;
+            const contentType = res.headers.get('content-type');
+            
+            // Check if response is JSON
+            if (contentType && contentType.includes('application/json')) {
+                responseData = await res.json();
+            } else {
+                const textResponse = await res.text();
+                console.log('Non-JSON response:', textResponse);
+                throw new Error(`Server returned ${res.status}: ${textResponse || 'Bad Request'}`);
+            }
+            
+            if (res.ok) {
+                alert('Login successful!');
+                // Here you would typically redirect or store the token
+                // window.location.href = '/dashboard';
+            } else {
+                passwordError.textContent = responseData.message || responseData.error || 'Invalid email or password';
+                passwordError.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Login Error:', error);
+            passwordError.textContent = 'Login failed. Please try again.';
+            passwordError.style.display = 'block';
+        } finally {
+            loginBtn.disabled = false;
+            document.getElementById('loginSpinner').style.display = 'none';
+            document.getElementById('loginBtnText').textContent = 'LOGIN';
+        }
+    });
+
+    // ---- Sign Up ----
+    signupBtn.addEventListener('click', async () => {
+        const username = document.getElementById('signupUsername').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const phone = document.getElementById('signupPhone').value.trim();
+        const password = document.getElementById('signupPassword').value;
+        const confirmPassword = document.getElementById('signupConfirmPassword').value;
+        
+        // Final validation
+        if (!validateSignupForm()) return;
+        
+        // Check if email is verified
+        if (!verifiedEmailToken) {
+            alert('Please verify your email first by clicking "Get OTP"');
+            return;
+        }
+        
+        signupBtn.disabled = true;
+        document.getElementById('signupSpinner').style.display = 'block';
+        document.getElementById('signupBtnText').textContent = 'SIGNING UP...';
+        
+        try {
+            // Prepare registration data according to your backend API
+            const registrationData = {
+                verifiedEmailToken: verifiedEmailToken,
+                username: username,
+                password: password,
+                email: email,
+                phoneNumber: phone,
+                role: "USER"
+            };
+            
+            console.log('Sending registration data:', registrationData);
+            
+            const res = await fetch('http://localhost:8080/api/auth/register', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(registrationData)
+            });
+            
+            console.log('Registration response status:', res.status);
+            
+            let responseData;
+            const contentType = res.headers.get('content-type');
+            
+            // Check if response is JSON
+            if (contentType && contentType.includes('application/json')) {
+                responseData = await res.json();
+            } else {
+                // If not JSON, get as text
+                const textResponse = await res.text();
+                console.log('Non-JSON response:', textResponse);
+                throw new Error(`Server returned ${res.status}: ${textResponse || 'Bad Request'}`);
+            }
+            
+            console.log('Registration response data:', responseData);
+            
+            if (res.ok) {
+                alert('Registration successful! You can now login.');
+                loginTab.click();
+                clearSignupForm();
+            } else {
+                // Handle specific error messages from server
+                const errorMessage = responseData.message || 
+                                    responseData.error || 
+                                    `Registration failed with status ${res.status}`;
+                alert(errorMessage);
+            }
+        } catch (error) { 
+            console.error('Registration Error:', error);
+            
+            // More user-friendly error messages
+            if (error.message.includes('400')) {
+                alert('Invalid registration data. Please check all fields and try again.');
+            } else if (error.message.includes('Failed to fetch')) {
+                alert('Network error. Please check your connection and try again.');
+            } else {
+                alert('Registration failed: ' + error.message);
+            }
+        } finally { 
+            signupBtn.disabled = false; 
+            document.getElementById('signupSpinner').style.display = 'none';
+            document.getElementById('signupBtnText').textContent = 'SIGN UP';
+        }
+    });
+
+    // ---- Utility Functions ----
+    function validateEmail(email) { 
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); 
+    }
+
+    function validateSignupForm() {
+        const username = document.getElementById('signupUsername').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const phone = document.getElementById('signupPhone').value.trim();
+        const password = document.getElementById('signupPassword').value;
+        const confirmPassword = document.getElementById('signupConfirmPassword').value;
+        
+        const usernameError = document.getElementById('signupUsernameError');
+        const emailError = document.getElementById('signupEmailError');
+        const phoneError = document.getElementById('signupPhoneError');
+        const passwordError = document.getElementById('signupPasswordError');
+        const confirmPasswordError = document.getElementById('signupConfirmPasswordError');
+        
+        let isValid = true;
+        
+        // Validate username
+        if (username.length < 4) {
+            usernameError.textContent = 'Username must be at least 4 characters';
+            usernameError.style.display = 'block';
+            isValid = false;
+        } else {
+            usernameError.style.display = 'none';
+        }
+        
+        // Validate email
+        if (!validateEmail(email)) {
+            emailError.textContent = 'Please enter a valid email address';
+            emailError.style.display = 'block';
+            isValid = false;
+        } else {
+            emailError.style.display = 'none';
+        }
+        
+        // Validate phone
+        const phoneDigits = phone.replace(/\D/g, '');
+        if (phoneDigits.length < 10) {
+            phoneError.textContent = 'Please enter a valid phone number (at least 10 digits)';
+            phoneError.style.display = 'block';
+            isValid = false;
+        } else {
+            phoneError.style.display = 'none';
+        }
+        
+        // Validate password
+        if (password.length < 6) {
+            passwordError.textContent = 'Password must be at least 6 characters';
+            passwordError.style.display = 'block';
+            isValid = false;
+        } else {
+            passwordError.style.display = 'none';
+        }
+        
+        // Validate confirm password
+        if (password !== confirmPassword) {
+            confirmPasswordError.textContent = 'Passwords do not match';
+            confirmPasswordError.style.display = 'block';
+            isValid = false;
+        } else {
+            confirmPasswordError.style.display = 'none';
+        }
+        
+        return isValid;
+    }
+
+    function clearAllErrors() {
+        const errors = document.querySelectorAll('.error-message');
+        errors.forEach(error => {
+            error.style.display = 'none';
+            error.textContent = '';
+        });
+        
+        const successes = document.querySelectorAll('.success-message');
+        successes.forEach(success => success.style.display = 'none');
+    }
+
+    function clearSignupForm() {
+        document.getElementById('signupUsername').value = '';
+        document.getElementById('signupEmail').value = '';
+        document.getElementById('signupPhone').value = '';
+        document.getElementById('signupPassword').value = '';
+        document.getElementById('signupConfirmPassword').value = '';
+        signupBtn.disabled = true;
+        verifiedEmailToken = "";
+    }
+
+    function showSuccessMessage(message) {
+        // Remove any existing success messages
+        const existingSuccess = document.querySelector('.success-message');
+        if (existingSuccess) {
+            existingSuccess.remove();
+        }
+        
+        const successMsg = document.createElement('div');
+        successMsg.className = 'success-message';
+        successMsg.textContent = message;
+        successMsg.style.display = 'block';
+        successMsg.style.marginTop = '10px';
+        document.getElementById('signupEmail').parentNode.appendChild(successMsg);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (successMsg.parentNode) {
+                successMsg.style.display = 'none';
+            }
+        }, 5000);
+    }
+
+    // ---- Modal Controls ----
+    closeOtpModal.addEventListener('click', () => { 
+        otpModal.style.display = 'none'; 
+        document.getElementById('otpCode').value = '';
+        document.getElementById('otpError').style.display = 'none';
+    });
+
+    cancelOtp.addEventListener('click', () => { 
+        otpModal.style.display = 'none'; 
+        document.getElementById('otpCode').value = '';
+        document.getElementById('otpError').style.display = 'none';
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', (e) => {
+        if (e.target === otpModal) {
+            otpModal.style.display = 'none';
+            document.getElementById('otpCode').value = '';
+            document.getElementById('otpError').style.display = 'none';
+        }
+    });
+
+    // Reset token when switching tabs
+    loginTab.addEventListener('click', () => {
+        verifiedEmailToken = "";
+    });
+
+    console.log('Authentication system initialized');
+</script>
+</body>
+</html>
