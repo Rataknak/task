@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rataknak.userservice.Entity.Role;
 import com.rataknak.userservice.Entity.User;
+import com.rataknak.userservice.Entity.UserProfile;
 import com.rataknak.userservice.Repository.UserRepository;
 import com.rataknak.userservice.dto.LoginRequest;
 import com.rataknak.userservice.dto.RegisterRequest;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -80,8 +82,6 @@ public class UserServiceImpl implements UserService {
         user.setPassword(hashedPassword);
         user.setPhoneNumber(registerRequest.getPhoneNumber());
         user.setRole(Role.valueOf(registerRequest.getRole().toUpperCase()));
-        user.setEmailVerified(true); // Email is verified at this point
-
         return userRepository.save(user);
     }
 
