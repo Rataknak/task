@@ -9,36 +9,27 @@ import com.rataknak.userservice.Repository.UserRepository;
 import com.rataknak.userservice.dto.LoginRequest;
 import com.rataknak.userservice.dto.RegisterRequest;
 import com.rataknak.userservice.service.UserService;
+
 import com.rataknak.userservice.util.JwtUtil;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.Random;
-
-import javax.crypto.SecretKey;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+
 
     @Autowired
     private JavaMailSender javaMailSender;
@@ -53,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User registerUser(String verifiedEmailToken, RegisterRequest registerRequest) {
+    public User registerUser(String verifiedEmailToken, RegisterRequest registerRequest, Role role) {
         Claims claims = jwtUtil.extractClaims(verifiedEmailToken);
 
         String email = claims.getSubject();
@@ -62,12 +53,10 @@ public class UserServiceImpl implements UserService {
         if (emailVerified == null || !emailVerified) {
             throw new RuntimeException("Email not verified. Please verify your email first.");
         }
-
         // Ensure the email from the token matches the email in the register request (if provided)
         if (registerRequest.getEmail() != null && !registerRequest.getEmail().equalsIgnoreCase(email)) {
             throw new RuntimeException("Email mismatch between token and registration request.");
         }
-
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
             throw new RuntimeException("Username is already taken!");
         }
@@ -77,12 +66,15 @@ public class UserServiceImpl implements UserService {
 
         User user = new User();
         user.setUsername(registerRequest.getUsername());
-        user.setEmail(email); // Use email from the verified token
+        user.setEmail(email);
         String hashedPassword = jwtUtil.hashPassword(registerRequest.getPassword());
         user.setPassword(hashedPassword);
         user.setPhoneNumber(registerRequest.getPhoneNumber());
-        user.setRole(Role.valueOf(registerRequest.getRole().toUpperCase()));
-        return userRepository.save(user);
+        user.setRole(role);
+        user.setEmailVerified(true);
+        User savedUser = userRepository.save(user);
+
+        return savedUser;
     }
 
     @Override
@@ -172,5 +164,17 @@ public class UserServiceImpl implements UserService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error generating JSON response", e);
         }
+    }
+
+    @Override
+    @Transactional
+    public User AdminRole(String token, RegisterRequest request) {
+        return registerUser(token, request, Role.ADMIN);
+    }
+
+    @Override
+    @Transactional
+    public User UserRole(String token, RegisterRequest request) {
+        return registerUser(token, request, Role.USER);
     }
 }

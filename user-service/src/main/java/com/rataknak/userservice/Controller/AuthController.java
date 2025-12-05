@@ -1,5 +1,6 @@
 package com.rataknak.userservice.Controller;
 
+import com.rataknak.userservice.Entity.Role;
 import com.rataknak.userservice.Entity.User;
 import com.rataknak.userservice.dto.EmailRequest;
 import com.rataknak.userservice.dto.JwtResponse;
@@ -26,21 +27,43 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
+    @PostMapping("/register/admin")
+    public ResponseEntity<?> registerAdmin(@RequestBody RegisterRequest request) {
         try {
-            User registeredUser = userService.registerUser(registerRequest.getVerifiedEmailToken(), registerRequest);
+            User user = userService.registerUser(
+                    request.getVerifiedEmailToken(),
+                    request,
+                    Role.ADMIN
+            );
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Registration successful!");
+            response.put("userId", user.getId());
+            response.put("email", user.getEmail());
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        }  catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/register/user")
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request) {
+        try {
+            User user = userService.registerUser(
+                    request.getVerifiedEmailToken(),
+                    request,
+                    Role.USER
+            );
 
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Registration successful!");
-            response.put("userId", registeredUser.getId());
-            response.put("email", registeredUser.getEmail());
-            response.put("username", registeredUser.getUsername());
+            response.put("userId", user.getId());
+            response.put("email", user.getEmail());
 
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+
     }
 
     @Autowired

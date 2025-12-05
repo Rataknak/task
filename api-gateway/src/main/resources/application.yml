@@ -12,6 +12,10 @@ spring:
           uri: http://user-service:8081
           predicates:
             - Path=/api/auth/**
+        - id: user-profile-service
+          uri: http://user-service:8081
+          predicates:
+            - Path=/api/profiles/**
         - id: book-service
           uri: http://book-service:8082
           predicates:

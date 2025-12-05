@@ -15,6 +15,8 @@ public class UserProfile {
     private String lastName;
     private LocalDate dateOfBirth;
     private String gender;
+    @Column(unique = false, nullable = true)
+    private String username;
     private String profilePicture;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -2,9 +2,769 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KOMPI - Library Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    :root {
+      --primary: #0C3B2E;
+      --primary-light: #1A4F3E;
+      --secondary: #2ECC71;
+      --danger: #E74C3C;
+      --warning: #F39C12;
+      --info: #3498DB;
+      --light: #F8F9FA;
+      --dark: #343A40;
+      --gray: #6C757D;
+      --light-gray: #E9ECEF;
+      --border-radius: 12px;
+      --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+
+    body {
+      background: #F5F7FB;
+      color: var(--dark);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: white;
+      border-right: 1px solid var(--light-gray);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .logo {
+      padding: 25px;
+      border-bottom: 1px solid var(--light-gray);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo i {
+      color: var(--primary);
+      font-size: 28px;
+    }
+
+    .logo h1 {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing: 1px;
+    }
+
+    .logo span {
+      font-size: 12px;
+      color: var(--gray);
+      font-weight: 400;
+    }
+
+    .nav-menu {
+      flex: 1;
+      padding: 20px 0;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px 25px;
+      color: var(--gray);
+      text-decoration: none;
+      transition: var(--transition);
+      border-left: 4px solid transparent;
+    }
+
+    .nav-item:hover {
+      background: var(--light);
+      color: var(--primary);
+    }
+
+    .nav-item.active {
+      background: var(--light);
+      color: var(--primary);
+      border-left-color: var(--primary);
+    }
+
+    .nav-item i {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+    }
+
+    .nav-text {
+      font-weight: 500;
+      font-size: 15px;
+    }
+
+    .badge {
+      background: var(--secondary);
+      color: white;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: auto;
+    }
+
+    .user-profile {
+      padding: 20px;
+      border-top: 1px solid var(--light-gray);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .user-info h3 {
+      font-size: 16px;
+      margin-bottom: 3px;
+      color: var(--dark);
+    }
+
+    .user-info p {
+      font-size: 13px;
+      color: var(--gray);
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      margin-left: 260px;
+      padding: 25px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 15px 25px;
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      background: var(--light);
+      border-radius: 30px;
+      padding: 10px 20px;
+      width: 400px;
+    }
+
+    .search-bar input {
+      border: none;
+      background: transparent;
+      padding: 0 15px;
+      font-size: 15px;
+      width: 100%;
+      outline: none;
+    }
+
+    .search-bar i {
+      color: var(--gray);
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .notification-btn {
+      position: relative;
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--gray);
+      cursor: pointer;
+    }
+
+    .notification-count {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--danger);
+      color: white;
+      font-size: 10px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: var(--box-shadow);
+      transition: var(--transition);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .book-icon { background: #E3F2FD; color: var(--info); }
+    .user-icon { background: #E8F5E9; color: var(--secondary); }
+    .borrow-icon { background: #FFF3E0; color: var(--warning); }
+    .overdue-icon { background: #FFEBEE; color: var(--danger); }
+
+    .stat-title {
+      font-size: 14px;
+      color: var(--gray);
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 10px;
+    }
+
+    .stat-change {
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .stat-change.positive { color: var(--secondary); }
+    .stat-change.negative { color: var(--danger); }
+
+    /* Charts & Tables */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: var(--box-shadow);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-light);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .btn-outline:hover {
+      background: var(--light);
+    }
+
+    /* Chart Placeholder */
+    .chart-placeholder {
+      height: 300px;
+      background: linear-gradient(to right, #F8F9FA, #E9ECEF);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray);
+      font-size: 14px;
+    }
+
+    /* Recent Activity */
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      background: var(--light);
+      border-radius: 8px;
+      transition: var(--transition);
+    }
+
+    .activity-item:hover {
+      background: var(--light-gray);
+    }
+
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .activity-content h4 {
+      font-size: 15px;
+      margin-bottom: 3px;
+      color: var(--dark);
+    }
+
+    .activity-content p {
+      font-size: 13px;
+      color: var(--gray);
+    }
+
+    .activity-time {
+      font-size: 12px;
+      color: var(--gray);
+      margin-left: auto;
+    }
+
+    /* Quick Actions */
+    .quick-actions-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .quick-action {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 20px;
+      text-align: center;
+      box-shadow: var(--box-shadow);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .quick-action:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .quick-action i {
+      font-size: 28px;
+      margin-bottom: 10px;
+      color: var(--primary);
+    }
+
+    .quick-action h3 {
+      font-size: 14px;
+      color: var(--dark);
+      margin-bottom: 5px;
+    }
+
+    .quick-action p {
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--gray);
+      font-size: 14px;
+      border-top: 1px solid var(--light-gray);
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 70px;
+      }
+      .main-content {
+        margin-left: 70px;
+      }
+      .nav-text, .logo h1, .logo span, .user-info {
+        display: none;
+      }
+      .logo {
+        justify-content: center;
+        padding: 20px;
+      }
+      .nav-item {
+        justify-content: center;
+        padding: 15px;
+      }
+      .badge {
+        display: none;
+      }
+      .top-bar {
+        flex-direction: column;
+        gap: 15px;
+      }
+      .search-bar {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="logo">
+    <i class="fas fa-book"></i>
+    <div>
+      <h1>KOMPI</h1>
+      <span>Library System</span>
+    </div>
+  </div>
 
+  <div class="nav-menu">
+    <a href="#" class="nav-item active">
+      <i class="fas fa-home"></i>
+      <span class="nav-text">Dashboard</span>
+    </a>
+    <a href="#" class="nav-item">
+      <i class="fas fa-book"></i>
+      <span class="nav-text">Books Catalog</span>
+      <span class="badge">1,245</span>
+    </a>
+    <a href="#" class="nav-item">
+      <i class="fas fa-users"></i>
+      <span class="nav-text">Members</span>
+      <span class="badge">456</span>
+    </a>
+    <a href="#" class="nav-item">
+      <i class="fas fa-exchange-alt"></i>
+      <span class="nav-text">Transactions</span>
+    </a>
+    <a href="#" class="nav-item">
+      <i class="fas fa-chart-line"></i>
+      <span class="nav-text">Analytics</span>
+    </a>
+    <a href="#" class="nav-item">
+      <i class="fas fa-cog"></i>
+      <span class="nav-text">Settings</span>
+    </a>
+  </div>
+
+  <div class="user-profile">
+    <div class="user-avatar">JD</div>
+    <div class="user-info">
+      <h3>John Doe</h3>
+      <p>Admin</p>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Search books, members, or transactions...">
+    </div>
+    <div class="top-actions">
+      <button class="notification-btn">
+        <i class="fas fa-bell"></i>
+        <span class="notification-count">3</span>
+      </button>
+      <button class="btn btn-outline">Logout</button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-header">
+        <div>
+          <div class="stat-title">Total Books</div>
+          <div class="stat-value">1,245</div>
+        </div>
+        <div class="stat-icon book-icon">
+          <i class="fas fa-book"></i>
+        </div>
+      </div>
+      <div class="stat-change positive">
+        <i class="fas fa-arrow-up"></i>
+        <span>12% from last month</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <div>
+          <div class="stat-title">Active Members</div>
+          <div class="stat-value">456</div>
+        </div>
+        <div class="stat-icon user-icon">
+          <i class="fas fa-users"></i>
+        </div>
+      </div>
+      <div class="stat-change positive">
+        <i class="fas fa-arrow-up"></i>
+        <span>8% from last month</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <div>
+          <div class="stat-title">Borrowed Today</div>
+          <div class="stat-value">34</div>
+        </div>
+        <div class="stat-icon borrow-icon">
+          <i class="fas fa-exchange-alt"></i>
+        </div>
+      </div>
+      <div class="stat-change negative">
+        <i class="fas fa-arrow-down"></i>
+        <span>5% from yesterday</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <div>
+          <div class="stat-title">Overdue Books</div>
+          <div class="stat-value">12</div>
+        </div>
+        <div class="stat-icon overdue-icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+      </div>
+      <div class="stat-change negative">
+        <i class="fas fa-arrow-up"></i>
+        <span>3 from yesterday</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts & Activity -->
+  <div class="content-grid">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Borrowing Trends</div>
+        <div class="card-actions">
+          <button class="btn btn-outline">Weekly</button>
+          <button class="btn btn-primary">Monthly</button>
+        </div>
+      </div>
+      <div class="chart-placeholder">
+        📊 Chart: Monthly borrowing statistics would appear here
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Recent Activity</div>
+        <button class="btn btn-outline">View All</button>
+      </div>
+      <div class="activity-list">
+        <div class="activity-item">
+          <div class="activity-icon book-icon">
+            <i class="fas fa-book"></i>
+          </div>
+          <div class="activity-content">
+            <h4>New Book Added</h4>
+            <p>"The Psychology of Money" by Morgan Housel</p>
+          </div>
+          <div class="activity-time">10 min ago</div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon user-icon">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          <div class="activity-content">
+            <h4>New Member Registered</h4>
+            <p>Sarah Johnson (Student ID: STU2024005)</p>
+          </div>
+          <div class="activity-time">25 min ago</div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon borrow-icon">
+            <i class="fas fa-exchange-alt"></i>
+          </div>
+          <div class="activity-content">
+            <h4>Book Borrowed</h4>
+            <p>"Clean Code" borrowed by Michael Chen</p>
+          </div>
+          <div class="activity-time">1 hour ago</div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon overdue-icon">
+            <i class="fas fa-exclamation-circle"></i>
+          </div>
+          <div class="activity-content">
+            <h4>Overdue Book Alert</h4>
+            <p>"Design Patterns" overdue by 3 days</p>
+          </div>
+          <div class="activity-time">2 hours ago</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Quick Actions</div>
+    </div>
+    <div class="quick-actions-grid">
+      <div class="quick-action">
+        <i class="fas fa-plus-circle"></i>
+        <h3>Add New Book</h3>
+        <p>Add book to catalog</p>
+      </div>
+      <div class="quick-action">
+        <i class="fas fa-user-plus"></i>
+        <h3>Register Member</h3>
+        <p>Add new library member</p>
+      </div>
+      <div class="quick-action">
+        <i class="fas fa-book-reader"></i>
+        <h3>Borrow Book</h3>
+        <p>Process book borrowing</p>
+      </div>
+      <div class="quick-action">
+        <i class="fas fa-undo"></i>
+        <h3>Return Book</h3>
+        <p>Process book return</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>KOMPI Library Management System © 2024 | Version 2.1.0</p>
+  </div>
+</div>
+
+<script>
+  // Simple interactive functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    // Active nav item
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        navItems.forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // Quick action buttons
+    const quickActions = document.querySelectorAll('.quick-action');
+    quickActions.forEach(action => {
+      action.addEventListener('click', function() {
+        const title = this.querySelector('h3').textContent;
+        alert(`Opening: ${title}`);
+      });
+    });
+
+    // Logout button
+    document.querySelector('.btn-outline').addEventListener('click', function() {
+      if (confirm('Are you sure you want to logout?')) {
+        window.location.href = 'index.html';
+      }
+    });
+
+    // Notification bell
+    document.querySelector('.notification-btn').addEventListener('click', function() {
+      alert('You have 3 unread notifications:\n\n1. New member registered\n2. Book overdue reminder\n3. System update available');
+    });
+  });
+</script>
 </body>
 </html>
