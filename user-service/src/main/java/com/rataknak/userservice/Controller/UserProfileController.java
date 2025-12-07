@@ -5,6 +5,8 @@ import com.rataknak.userservice.Entity.UserProfile;
 import com.rataknak.userservice.dto.CreateProfileRequest;
 import com.rataknak.userservice.service.UserProfileService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/profiles")
 public class UserProfileController {
+    private static final Logger logger = LoggerFactory.getLogger(UserProfileController.class);
+
 
     @Autowired
     private UserProfileService userProfileService;
@@ -36,15 +40,20 @@ public class UserProfileController {
 
     @PostMapping("/me")
     public ResponseEntity<?> createMyProfile(@RequestBody CreateProfileRequest createProfileRequest, HttpServletRequest request) {
-        User authenticatedUser = (User) request.getAttribute("authenticatedUser");
-        if (authenticatedUser == null) {
-            return new ResponseEntity<>("User not authenticated", HttpStatus.UNAUTHORIZED);
+        try {
+            User authenticatedUser = (User) request.getAttribute("authenticatedUser");
+            if (authenticatedUser == null) {
+                return new ResponseEntity<>("User not authenticated", HttpStatus.UNAUTHORIZED);
+            }
+            UserProfile existingProfile = userProfileService.getUserProfile(authenticatedUser);
+            if (existingProfile != null) {
+                return new ResponseEntity<>(existingProfile, HttpStatus.OK);
+            }
+            UserProfile newUserProfile = userProfileService.createUserProfile(authenticatedUser, createProfileRequest);
+            return new ResponseEntity<>(newUserProfile, HttpStatus.CREATED);
+        } catch (Exception e) {
+            logger.error("Error creating profile: {}", e.getMessage());
+            return new ResponseEntity<>("Error creating profile", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        UserProfile existingProfile = userProfileService.getUserProfile(authenticatedUser);
-        if (existingProfile != null) {
-            return new ResponseEntity<>("Profile already exists", HttpStatus.CONFLICT);
-        }
-        UserProfile newUserProfile = userProfileService.createUserProfile(authenticatedUser, createProfileRequest);
-        return new ResponseEntity<>(newUserProfile, HttpStatus.CREATED);
     }
 }

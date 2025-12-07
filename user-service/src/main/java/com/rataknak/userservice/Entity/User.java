@@ -1,6 +1,7 @@
 package com.rataknak.userservice.Entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +17,7 @@ public class User {
 
     @Column(unique = false, nullable = true)
     private String username;// optional
+    @JsonIgnore
     private String password;
     private String phoneNumber;
 
@@ -23,7 +25,9 @@ public class User {
     @Column(unique = true)
     private String email;
     private boolean emailVerified = false;
+    @JsonIgnore
     private String verificationCode;
+    @JsonIgnore
     private LocalDateTime codeExpiry;
 
     @Enumerated(EnumType.STRING)
